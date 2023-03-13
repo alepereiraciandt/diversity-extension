@@ -12,10 +12,9 @@ chrome.runtime.onInstalled.addListener(async () => {
     }
 });
 
-
 chrome.webRequest.onBeforeRequest.addListener((details) =>{
   const rawInput = details.requestBody.formData["f.req"][0];
-  
+
   if (rawInput.includes(typingCode)) {
     const [[[_, userMessage]]] = JSON.parse(rawInput);
     const [ message ]  = JSON.parse(userMessage);
@@ -25,11 +24,9 @@ chrome.webRequest.onBeforeRequest.addListener((details) =>{
         term.split(",").forEach((trm) => {
             if (message.toLowerCase().includes(trm)) {
               chrome.tabs.query({active: true, currentWindow: true}, (tabs) => {
-                let payload = {
-                  trm,
-                  explanation,
-                  suggestion
-                };
+
+                let payload = { trm, explanation, suggestion };
+
                 chrome.tabs.sendMessage(tabs[0].id, payload);
               });
             }

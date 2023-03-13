@@ -53,6 +53,16 @@ const createCloseButton = (popUp) => {
     popUp.style.display = "none";
   });
 
+/*TODO
+  VERIFICAR PQ NAO FECHA POPUP NO PRIMEIRO CLICK DO ESC
+*/
+  document.addEventListener('keydown', ({ key }) => {
+    console.log('esc clicked down');
+    if (key === "Escape") {
+      popUp.style.display = "none";
+    }
+  });  
+
   closeButton.addEventListener("mouseover", () => {
       closeButton.style.opacity = "1";
       closeButton.style.transition = "transform .7s ease-in-out";
