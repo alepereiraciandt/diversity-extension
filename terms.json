@@ -75,12 +75,22 @@
     "sugestoes": "\"Ela está estressada hoje.\" ou \"Ela está irritada.\""
   },
   {
-    "termos": "funcionário,funcionária,funcionario,funcionaria,pcd",
-    "explicação": "A deficiência é apenas uma das inúmeras características da pessoa, por isso ela não deve ser identificada apenas como uma pessoa com deficiência. É importante atentar para a individualidade de cada um.",
+    "termos": "pcd,deficiente",
+    "explicacao": "A deficiência é apenas uma das inúmeras características da pessoa, por isso ela não deve ser identificada apenas como uma pessoa com deficiência. É importante atentar para a individualidade de cada um.",
     "sugestoes": "apenas o nome da pessoa sem se referenciar às características físicas dela"
   },
   {
-    "termos": "surdo,surda,mudo,muda)",
+    "termos": "empregado,empregada",
+    "explicacao": "A utilização da expressão “colaborador” não é aleatória ou acidental. Ela se contrapõe a “empregado”, voz passiva do verbo empregar, ou seja, aquele que é usado, submetido em sua vontade por outrem.",
+    "sugestoes": "colaborador"
+  },
+  {
+    "termos": "funcionario,funcionaria,funcionário,funcionária",
+    "explicacao": "Colaborador é um termo que vem sendo usado pelas empresas, sobretudo a partir dos anos 1990, como sinônimo de funcionário ou empregado. Ao contrário do funcionário, que é aquele que executa uma função, a palavra colaborador possui uma dimensão mais participativa.",
+    "sugestoes": "colaborador"
+  },
+  {
+    "termos": "surdo,surda,mudo,muda",
     "explicacao": "É uma expressão equivocada. Dizer que pessoas surdas são automaticamente mudas é incorreto, pois pessoas surdas podem desenvolver a oralidade. A ideia de mudez também implica uma ausência de comunicação, que não é verdade, pois as pessoas surdas podem se comunicar também através de Libras.",
     "sugestoes": "pessoa surda"
   },

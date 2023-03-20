@@ -1,4 +1,3 @@
-
 chrome.runtime.onMessage.addListener((payload, sender, resp) => {
 
   //.possible map element.
@@ -10,9 +9,18 @@ chrome.runtime.onMessage.addListener((payload, sender, resp) => {
     }
   });
 
-  const popUp = createPopUp(payload);
-
+  const popUp = createPopUp(payload, chatArea);
+  
   chatArea.appendChild(popUp);
+
+  const handleClearPopUp = ({ key }) => {
+    console.log('esc clicked down');
+    if (key === "Escape" && popUp) {
+      clearPopUp(popUp, handleClearPopUp);
+    }
+  }
+
+  document.addEventListener('keydown', handleClearPopUp);
 
   animatePopUp(popUp);
 
@@ -20,7 +28,8 @@ chrome.runtime.onMessage.addListener((payload, sender, resp) => {
 
 });
 
-const createPopUp = ({ explanation, suggestion, trm }) => {
+
+const createPopUp = ({ explanation, suggestion, trm }, chatArea) => {
   const popUp = document.createElement("div");
   
   popUp.classList.add("DiversityExtensionPopUp");
@@ -38,30 +47,31 @@ const createPopUp = ({ explanation, suggestion, trm }) => {
   popUp.style.bottom = "150px";
   popUp.innerHTML = `<button>X</button>`;
   popUp.innerHTML += `<h2>\u26A0\uFE0F  ${toTitleCase(trm)}</h2>
-  <p>${explanation} Que tal usar <strong>${toTitleCase(suggestion)}</strong> no lugar?</p>`;
+  <p>${explanation} Que tal utilizar <strong>${toTitleCase(suggestion)}</strong> no lugar?</p>`;
 
-  createCloseButton(popUp);
+  createCloseButton(popUp, chatArea);
 
   return popUp;
 }
 
-const createCloseButton = (popUp) => {
+const clearPopUp = (popUp, handleClearPopUp) => {
+  popUp.style.display = "none";
+  if (popUp && popUp.parentNode) {
+    popUp.parentNode.removeChild(popUp);
+  }
+  popUp = null;
+
+  document.removeEventListener('keydown', handleClearPopUp);
+}
+
+const createCloseButton = (popUp, chatArea) => {
 
   const closeButton = popUp.childNodes[0];
 
   closeButton.addEventListener("click", () => {
     popUp.style.display = "none";
+    chatArea.removeChild(popUp)
   });
-
-/*TODO
-  VERIFICAR PQ NAO FECHA POPUP NO PRIMEIRO CLICK DO ESC
-*/
-  document.addEventListener('keydown', ({ key }) => {
-    console.log('esc clicked down');
-    if (key === "Escape") {
-      popUp.style.display = "none";
-    }
-  });  
 
   closeButton.addEventListener("mouseover", () => {
       closeButton.style.opacity = "1";
