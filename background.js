@@ -3,15 +3,10 @@ const termsPath = chrome.runtime.getURL("./terms.json");
 const typingCode = "xok6wd";
 const enterCode = "RTBQkb";
 
-chrome.runtime.onInstalled.addListener(async () => {
-    try {
-      const data = await fetch(termsPath);
-      const terms = await data.json();
-      chrome.storage.local.set({ terms });
-    } catch (error) {
-      console.log(error.message);
-    }
-});
+let TERMS_MAP;
+let memoLength;
+let isPopPupOn = true;
+let timeout = 16_000;
 
 chrome.webRequest.onBeforeRequest.addListener((details) =>{
   const rawInput = details.requestBody.formData["f.req"][0];
@@ -27,7 +22,10 @@ chrome.webRequest.onBeforeRequest.addListener((details) =>{
     const [[[_, userMessage]]] = JSON.parse(rawInput);
     const [ message ]  = JSON.parse(userMessage);
 
-    handleSendMessage(message);
+    if (memoLength != message.length) {
+      handleSendMessage(message);
+    }
+    memoLength = message.length;
   }
 
   },
@@ -35,29 +33,49 @@ chrome.webRequest.onBeforeRequest.addListener((details) =>{
   ['requestBody']
 );
 
-function handleSendMessage(message) {
-  chrome.storage.local.get("terms", ({ terms }) => {
-    terms.forEach(({ explicacao: explanation, sugestoes: suggestion, termos: term }) => {
-      term.split(",").forEach((trm) => {
-        
-        let test = `/\b ${trm} \b/g`;
-        let re = new RegExp(test);
+async function getTerms() {
+  try {
+    if (!TERMS_MAP) {
+    const data = await fetch(termsPath);
+    const terms = await data.json();
+    const mapTerm = new Map();
 
-        console.log({ message })
+      terms.forEach((term) => {
+        let keyTerm = term.termos.split(",");
 
-        console.log({ re })
-
-        if (message.toLowerCase().match(re)) {
-          console.log('deu match')
-          chrome.tabs.query({active: true, currentWindow: true}, (tabs) => {
-
-            let payload = { trm, explanation, suggestion };
-
-            chrome.tabs.sendMessage(tabs[0].id, payload);
-          });
-          return;
-        }
+        keyTerm.forEach((key) => mapTerm.set(key, [term.explicacao, term.sugestoes]))
       });
-    })
+    
+      TERMS_MAP = mapTerm;
+    }
+    return TERMS_MAP;
+  } catch (error) {
+    console.log(error.message);
+  }
+}
+
+async function handleSendMessage(message) {
+
+  const term = await getTerms();
+
+  const arrayMsg = message.toLowerCase().replace(/[^\w\s]/g, '').split(/\s+/);
+
+  arrayMsg.forEach((msg) => {
+    if (term.has(msg) && isPopPupOn) {
+      showPopUp(msg, term.get(msg));
+    }
+  });
+}
+
+function showPopUp(trm, data) {
+  const [explanation, suggestion] = data;
+
+    chrome.tabs.query({active: true, currentWindow: true}, (tabs) => {
+
+      let payload = { trm, explanation, suggestion };
+
+      chrome.tabs.sendMessage(tabs[0].id, payload);
+      isPopPupOn = false;
+      setTimeout(() => isPopPupOn = true, timeout);
   });
 }
