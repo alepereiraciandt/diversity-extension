@@ -1,33 +1,37 @@
+let popupAtivo = false;
+
 chrome.runtime.onMessage.addListener((payload, sender, resp) => {
 
-  //.possible map element.
-  const chatArea = document.querySelector(".AO");
+    if (!popupAtivo) {
+      popupAtivo = true;
 
-  chatArea.childNodes.forEach((node) => {
-    if (node.classList.contains("DiversityExtensionPopUp")) {
-      chatArea.removeChild(node);
+      const chatArea = document.querySelector(".AO");
+
+      chatArea.childNodes.forEach((node) => {
+        if (node.classList.contains("DiversityExtensionPopUp")) {
+          chatArea.removeChild(node);
+        }
+      });
+    
+      const popUp = createPopUp(payload, chatArea);
+      
+      chatArea.appendChild(popUp);
+    
+      const handleClearPopUp = ({ key }) => {
+        console.log('esc clicked down');
+        if (key === "Escape" && popUp) {
+          popupAtivo = false;
+          clearPopUp(popUp, handleClearPopUp);
+        }
+      }
+    
+      document.addEventListener('keydown', handleClearPopUp);
+    
+      animatePopUp(popUp);
+    
+      clearAnimatePopUp(popUp);
     }
-  });
-
-  const popUp = createPopUp(payload, chatArea);
-  
-  chatArea.appendChild(popUp);
-
-  const handleClearPopUp = ({ key }) => {
-    console.log('esc clicked down');
-    if (key === "Escape" && popUp) {
-      clearPopUp(popUp, handleClearPopUp);
-    }
-  }
-
-  document.addEventListener('keydown', handleClearPopUp);
-
-  animatePopUp(popUp);
-
-  clearAnimatePopUp(popUp);
-
 });
-
 
 const createPopUp = ({ explanation, suggestion, trm }, chatArea) => {
   const popUp = document.createElement("div");
@@ -69,8 +73,9 @@ const createCloseButton = (popUp, chatArea) => {
   const closeButton = popUp.childNodes[0];
 
   closeButton.addEventListener("click", () => {
+    popupAtivo = false;
     popUp.style.display = "none";
-    chatArea.removeChild(popUp)
+    chatArea.removeChild(popUp);
   });
 
   closeButton.addEventListener("mouseover", () => {
@@ -123,6 +128,7 @@ const clearAnimatePopUp = (popUp) => {
         popUp.style.right = pos + 'px';
       }
     }
+    popupAtivo = false;
   }, 15_000);
 }
 

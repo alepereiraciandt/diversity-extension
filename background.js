@@ -5,8 +5,6 @@ const enterCode = "RTBQkb";
 
 let TERMS_MAP;
 let memoLength;
-let isPopPupOn = true;
-let timeout = 16_000;
 
 chrome.webRequest.onBeforeRequest.addListener((details) =>{
   const rawInput = details.requestBody.formData["f.req"][0];
@@ -17,7 +15,7 @@ chrome.webRequest.onBeforeRequest.addListener((details) =>{
 
     handleSendMessage(message);
   }
-  
+
   if(rawInput.includes(typingCode)) {
     const [[[_, userMessage]]] = JSON.parse(rawInput);
     const [ message ]  = JSON.parse(userMessage);
@@ -45,7 +43,7 @@ async function getTerms() {
 
         keyTerm.forEach((key) => mapTerm.set(key, [term.explicacao, term.sugestoes]))
       });
-    
+
       TERMS_MAP = mapTerm;
     }
     return TERMS_MAP;
@@ -61,7 +59,7 @@ async function handleSendMessage(message) {
   const arrayMsg = message.toLowerCase().replace(/[^\w\s]/g, '').split(/\s+/);
 
   arrayMsg.forEach((msg) => {
-    if (term.has(msg) && isPopPupOn) {
+    if (term.has(msg)) {
       showPopUp(msg, term.get(msg));
     }
   });
@@ -75,7 +73,5 @@ function showPopUp(trm, data) {
       let payload = { trm, explanation, suggestion };
 
       chrome.tabs.sendMessage(tabs[0].id, payload);
-      isPopPupOn = false;
-      setTimeout(() => isPopPupOn = true, timeout);
   });
 }
